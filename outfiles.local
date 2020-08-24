@@ -1,0 +1,4 @@
+TARGETS = obli_cli.c obli.c sys_paths.c
+VPATH = src:src/libobli:src/contrib
+INCFLAGS = -Isrc -Isrc/libobli -Isrc/contrib
+IGNFILES = obli_cli.h obli.h
