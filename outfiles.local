@@ -1,7 +1,10 @@
-SRC_TARGETS = obli_cli.c obli.c sys_paths.c murmurhash.c
-SRC_INCFLAGS = -Isrc -Isrc/libobli -Isrc/contrib -Isrc/contrib/murmurhash -Isrc/contrib/murmurhash/man -Isrc/contrib/nsandman
-SRC_IGNFILES = obli_cli.h sys_paths.h constants.h obli.h murmurhash.h colorprinter.h
+CLIENT_TARGETS = obli_cli.c
+CLIENT_INCFLAGS = -Iclient -Iclient/contrib -Iclient/contrib/nsandman
+CLIENT_IGNFILES = obli_cli.h colorprinter.h
 DAEMON_TARGETS = main.go
 DAEMON_INCFLAGS = -Idaemon
 DAEMON_IGNFILES =
-VPATH = src:src/libobli:src/contrib:src/contrib/murmurhash:src/contrib/murmurhash/man:src/contrib/nsandman:daemon
+LIB_TARGETS = out/obli.o out/sys_paths.o out/murmurhash.o
+LIB_INCFLAGS = -Ilib -Ilib/contrib -Ilib/contrib/murmurhash -Ilib/contrib/murmurhash/man
+LIB_IGNFILES =
+VPATH = client:client/contrib:client/contrib/nsandman:daemon:lib:lib/contrib:lib/contrib/murmurhash:lib/contrib/murmurhash/man

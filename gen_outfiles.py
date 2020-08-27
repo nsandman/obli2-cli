@@ -7,12 +7,29 @@ listen_files = ["h"]
 no_process = ["main.c", "test.c"]
 
 # source directories relative and absolute
-srces_rel = ["src", "daemon"]
+srces_mod = {
+    "client": False,
+    "daemon": False,
+    "lib": True
+}
+srces_rel = list(srces_mod.keys())
+mod_extensions = {
+    "c": ""
+}
 out_path = "outfiles.local"
 
 # generate target name based on file name
-def gen_target(file_name, file_ext):
-    return " " + file_name + "." + file_ext
+def gen_target(file_name, file_ext, modify=False):
+    if "{}.{}".format(file_name, file_ext) in no_process:
+        return None
+
+    if modify:
+        try:
+            return " out/" + file_name + mod_extensions[file_ext] + ".o"
+        except KeyError:
+            return None
+    else:
+        return " " + file_name + "." + file_ext
 
 vpath = "VPATH = "
 vpath_modified = False
@@ -48,11 +65,13 @@ if __name__ == "__main__":
 
                 # we already manually added start
                 if file_name != "start":
-                    new_target = gen_target(file_name, file_ext)
-                    if (file_ext in code_files) and (new_target.strip() not in no_process):
-                        targets += new_target
-                    elif file_ext in listen_files:
-                        ignpath += new_target
+                    new_target = gen_target(file_name, file_ext, srces_mod[src_rel])
+
+                    if new_target:
+                        if (file_ext in code_files):
+                            targets += new_target
+                        elif file_ext in listen_files:
+                            ignpath += new_target
 
         # write our variables to our output files
         out_file.write(targets + "\n")
