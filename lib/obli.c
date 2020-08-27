@@ -26,7 +26,7 @@ int obli_setupPrefixIfNotExists() {
         creationStatus = OBLI_PREFIX_CREATED;
     }
 
-    free(obliDirPath);
+    _obli_freePrefixPath(obliDirPath);
 
     const char *subdirectories[] = {
         OBLI_DIR_MODULES,
@@ -42,6 +42,8 @@ int obli_setupPrefixIfNotExists() {
         } else if ((lastFolderResult == 0) && (creationStatus != OBLI_PREFIX_CREATED)) {
             creationStatus = OBLI_PREFIX_POPULATED;
         }
+
+        _obli_freePrefixPath(newFolderPath);
     }
 
     return creationStatus;
@@ -133,4 +135,5 @@ void obli_killDaemon() {
 
     kill(pid, SIGKILL);          // kill int pid read from file
     remove(pidFile);
+    _obli_freePrefixPath(pidFile);
 }

@@ -1,6 +1,6 @@
-CLIENT_TARGETS = obli_cli.c
+CLIENT_TARGETS = run.c obli_cli.c colorprinter.c
 CLIENT_INCFLAGS = -Iclient -Iclient/contrib -Iclient/contrib/nsandman
-CLIENT_IGNFILES = obli_cli.h colorprinter.h
+CLIENT_IGNFILES = obli_cli.h run.h colorprinter.h
 DAEMON_TARGETS = main.go
 DAEMON_INCFLAGS = -Idaemon
 DAEMON_IGNFILES =

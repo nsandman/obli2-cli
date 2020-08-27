@@ -20,7 +20,7 @@ out/%.o: %.c
 out/libobli.a: $(LIB_TARGETS)
 	ar -rc $@ $^
 
-out/obli: $(CLIENT_TARGETS) out/libobli.a
+out/obli: out/libobli.a $(CLIENT_TARGETS)
 	$(CC) $(CLIENT_INCFLAGS) $(LIB_INCFLAGS) $^ -o $@ -lgit2
 
 out/oblid: $(DAEMON_TARGETS)
