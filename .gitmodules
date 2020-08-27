@@ -1,0 +1,3 @@
+[submodule "src/contrib/murmurhash"]
+	path = src/contrib/murmurhash
+	url = https://github.com/jwerle/murmurhash.c.git

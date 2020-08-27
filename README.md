@@ -6,9 +6,14 @@ Before, you might have had to run two separate servers to give obli all the func
 
 For this to compile, your system will need the following:
 
-1. libgit2 (tested with v1.0.1)
+1. [libgit2](https://libgit2.org/) (tested with v1.0.1)
+2. upx (dist only)
 
-## Feature Wishlist
+## How To Build
+
+You can build this by running `make` or `make dist` (which will strip debug information and compress the daemon executable).
+
+## Overall obli2 Feature Wishlist
 
 1. Collaborative editing of files if you share an organization
 2. Cleaner UI

@@ -4,9 +4,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "obli_cli.h"
+#include <colorprinter.h>
 
 #include "obli.h"
+#include "obli_cli.h"
+#include "constants.h"
 
 const char *commands[] = {
     OBLI_CMD_HELP,
@@ -33,29 +35,55 @@ const char *commandBlurbs[] = {
 void runShowHelp(const char *programName) {
     printf("Usage: %s [option]. Please run \"%s help\" for help.\n\n", programName, programName);
 
-    uint8_t numCommands = ARRAY_SIZE(commands);
+    uint8_t numCommands = LEN_ARRAY(commands);
     for (int i = 0; i < numCommands; i++) {
         printf("\t\033[1m%s\033[0m: %s\n", commands[i], commandBlurbs[i]);
     }
 }
 
-void runStart(bool strong) {
+int _quickPrefix() {
     int prefixCreated = obli_setupPrefixIfNotExists();
-    if (prefixCreated == 0) {
-        puts("Created prefix in ~/.obli");
-    } else if (prefixCreated == -1) {
-        puts("Error creating prefix in ~/.obli");
+    switch (prefixCreated) {
+        case OBLI_FILESYS_ERROR:
+            cfputs("Error creating prefix.", red, stderr);
+            break;
+
+        case OBLI_PREFIX_CREATED:
+            cputs("Created prefix.", green);
+            break;
+
+        case OBLI_PREFIX_POPULATED:
+            cputs("Populated prefix.", green);
+            break;
+
+        case OBLI_PREFIX_OK:
+        default:
+            break; 
     }
+
+    // returns Unix error codes but negative
+    if (prefixCreated < 0)
+        exit(prefixCreated * -1);
+    
+    return prefixCreated;
+}
+
+// TODO: start daemon
+void runStart(bool strong) {
+    _quickPrefix();
 }
 
 void runInstall(int num, char **names) {
+    _quickPrefix();
+
     for (int i = 0; i < num; i++) {
         const char *module = names[i];
+        unsigned int hash = obli_hashModuleName(module);
 
-        printf("%d. Installing module %s... ", i+1, module);
+        printf("%d. Install: %x (%s)... ", i+1, hash, module);
         obli_installModule(module);
 
-        puts("Done!");
+        cputs("Done!", green);
     }
 }
 
@@ -83,12 +111,13 @@ int main(int argc, char **argv) {
     }
     else if (strcmp(commandName, OBLI_CMD_INSTALL) == 0) {
         if (argc < 3) {
-            puts("Please specify at least one module (format: <github/repository> or git url) to install");
+            cfputs("Please specify at least one module (format: <github/repository> or <url to git repo>) to install\n", red, stderr);
+            return EPERM;
         }
         runInstall(argc-2, argv+2);
     }
     else {
-        printf("Unknown command <%s>.\n", commandName);
+        cfprintf(stderr, red, "Unknown command <%s>.\n", commandName);
         runShowHelp(argv[0]);
     }
 

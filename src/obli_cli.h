@@ -3,8 +3,6 @@
 
 #include <stdbool.h>
 
-#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
-
 #define OBLI_VERSION "2.0a"
 
 #define OBLI_CMD_HELP "help"
@@ -18,5 +16,7 @@
 
 void runShowHelp(const char*);
 void runStart(bool);
+
+int _quickPrefix();
 
 #endif // _OBLI_MAIN_H

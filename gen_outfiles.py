@@ -2,58 +2,63 @@ import os
 
 # what file extensions are code, and what to append onto the target
 # name so make will know what compiler to use
-code_files = {
-    "c": ""
-}
-
-# generate two Makefile variables: targets (all the files to build)
-# and VPATH, the directories make will search
-# start must be first so it's at the beginning of the binary
-targets = "TARGETS ="
-vpath   = "VPATH = "
-incpath = "INCFLAGS ="
-ignpath = "IGNFILES ="
+code_files = ["c", "go"]
+listen_files = ["h"]
+no_process = ["main.c", "test.c"]
 
 # source directories relative and absolute
-src_rel = "src"
-sources = os.path.join(os.getcwd(), src_rel)
+srces_rel = ["src", "daemon"]
+out_path = "outfiles.local"
 
 # generate target name based on file name
 def gen_target(file_name, file_ext):
-    global ignpath
-    try:
-        return " " + file_name + code_files[file_ext] + "." + file_ext
-        #return " out/" + file_name + code_files[file_ext] + ".o"
-    except KeyError:
-        if (file_ext != "DS_Store"):
-            ignpath += " " + file_name + "." + file_ext
-        return None
+    return " " + file_name + "." + file_ext
+
+vpath = "VPATH = "
+vpath_modified = False
 
 if __name__ == "__main__":
-    for folder, _, files in os.walk(sources):
-        relative_folder = os.path.relpath(folder, os.getcwd())
-        if relative_folder != src_rel:    # don't prepend : if first element
-            vpath += ":"
-        vpath += relative_folder
-        incpath += " -I" + relative_folder
+    out_file = open(out_path, "w")
 
-        for file in files:
-            file_parts = file.split(".")
+    for src_rel in srces_rel:
+        sources = os.path.join(os.getcwd(), src_rel)
 
-            file_name  = "".join(file_parts[:-1])
-            file_ext   = file_parts[-1]
+        # generate two Makefile variables: targets (all the files to build)
+        # and VPATH, the directories make will search
+        # start must be first so it's at the beginning of the binary
+        src_name_makefile = src_rel.upper() + "_"
 
-            # we already manually added start
-            if file_name != "start":
-                new_target = gen_target(file_name, file_ext)
-                if new_target != None:
-                    targets += new_target
+        targets = src_name_makefile + "TARGETS ="
+        incpath = src_name_makefile + "INCFLAGS ="
+        ignpath = src_name_makefile + "IGNFILES ="
 
-    # write our variables to our output files
-    f = open("outfiles.local", "w")
-    f.write(targets + "\n")
-    f.write(vpath + "\n")
-    f.write(incpath + "\n")
-    f.write(ignpath)
-    f.close()
+        for folder, _, files in os.walk(sources):
+            relative_folder = os.path.relpath(folder, os.getcwd())
+            if vpath_modified:    # don't prepend : if first element
+                vpath += ":"
+            vpath += relative_folder
+            incpath += " -I" + relative_folder
+            vpath_modified = True
+
+            for file in files:
+                file_parts = file.split(".")
+
+                file_name  = "".join(file_parts[:-1])
+                file_ext   = file_parts[-1]
+
+                # we already manually added start
+                if file_name != "start":
+                    new_target = gen_target(file_name, file_ext)
+                    if (file_ext in code_files) and (new_target.strip() not in no_process):
+                        targets += new_target
+                    elif file_ext in listen_files:
+                        ignpath += new_target
+
+        # write our variables to our output files
+        out_file.write(targets + "\n")
+        out_file.write(incpath + "\n")
+        out_file.write(ignpath + "\n")
+
+    out_file.write(vpath + "\n")     
+    out_file.close()
 

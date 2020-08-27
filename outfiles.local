@@ -1,4 +1,7 @@
-TARGETS = obli_cli.c obli.c sys_paths.c
-VPATH = src:src/libobli:src/contrib
-INCFLAGS = -Isrc -Isrc/libobli -Isrc/contrib
-IGNFILES = obli_cli.h obli.h
+SRC_TARGETS = obli_cli.c obli.c sys_paths.c murmurhash.c
+SRC_INCFLAGS = -Isrc -Isrc/libobli -Isrc/contrib -Isrc/contrib/murmurhash -Isrc/contrib/murmurhash/man -Isrc/contrib/nsandman
+SRC_IGNFILES = obli_cli.h sys_paths.h constants.h obli.h murmurhash.h colorprinter.h
+DAEMON_TARGETS = main.go
+DAEMON_INCFLAGS = -Idaemon
+DAEMON_IGNFILES =
+VPATH = src:src/libobli:src/contrib:src/contrib/murmurhash:src/contrib/murmurhash/man:src/contrib/nsandman:daemon
