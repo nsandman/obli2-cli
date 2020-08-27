@@ -5,7 +5,7 @@ SHRINK_EXECUTABLES = out/oblid
 
 all: start
 	make next
-prod: start
+dist: start
 	make dnext GOLDFLAGS="-ldflags=\"-s -w\""
 
 start:
