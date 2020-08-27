@@ -10,6 +10,7 @@
 #define OBLI_CMD_START "start"
 #define OBLI_CMD_STARTW "startWeak"
 #define OBLI_CMD_STARTS "startStrong"
+#define OBLI_CMD_KILL "kill"
 #define OBLI_CMD_INSTALL "install"
 #define OBLI_CMD_REMOVE "remove"
 #define OBLI_CMD_LSMOD "listModules"

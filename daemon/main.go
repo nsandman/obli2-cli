@@ -15,6 +15,7 @@ func runServer(c net.Conn) {
 
 /** SYNTAX: oblid <socket dir> **/
 func main() {
+	log.Print("Starting obli daemon")
 	SockAddr := os.Args[1] + "/oblid.sock"
 
 	if err := os.RemoveAll(SockAddr); err != nil {

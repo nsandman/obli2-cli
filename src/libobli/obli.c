@@ -1,7 +1,9 @@
+#include <math.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
+#include <signal.h>
 
 #include <git2.h>
 #include <git2/clone.h>
@@ -27,9 +29,9 @@ int obli_setupPrefixIfNotExists() {
     free(obliDirPath);
 
     const char *subdirectories[] = {
-        OBLI_MODULES_DIR,
-        OBLI_PROGRAM_DIR,
-        OBLI_NETWORK_DIR
+        OBLI_DIR_MODULES,
+        OBLI_DIR_PROGRAM,
+        OBLI_DIR_NETWORK
     };
     for (int i = 0; i < LEN_ARRAY(subdirectories); i++) {
         char *newFolderPath = _obli_genPrefixPath(1, subdirectories[i]);
@@ -50,7 +52,7 @@ unsigned int obli_hashModuleName(const char *key) {
 }
 
 int obli_installModule(const char *moduleName) {
-    char *modulesPath = _obli_genPrefixPath(1, OBLI_MODULES_DIR);
+    char *modulesPath = _obli_genPrefixPath(1, OBLI_DIR_MODULES);
     int didCreateModulesDir = _obli_createFolderIfNotExists(modulesPath);
     if (didCreateModulesDir == -1)
         return -1;
@@ -90,15 +92,45 @@ int obli_installModule(const char *moduleName) {
     return 0;
 }
 
+/** LAUNCH OBLID **/
 void obli_launchDaemon() {
-    const char *obliDirPath = _obli_genPrefixPath(0);
-    char *daemonPath = _obli_genPrefixPath(2, OBLI_PROGRAM_DIR, "oblid");
-    char *socketPath = _obli_genPrefixPath(2, OBLI_NETWORK_DIR, "daemon.sock");
+    char *pidFile = _obli_genPrefixPath(1, OBLI_FILE_DAEMON);
+    if (access(pidFile, F_OK) != -1)
+        return;                 // if pidFile exists, assume we are already running
 
-    sprintf(daemonPath, "%s/bin/oblid", obliDirPath);
+    int pid = fork();
+    if (pid > 0) {         // parent: save child process id to file and exit 
+        FILE *f = fopen(pidFile, "w");
+        fprintf(f, "%d", pid);
+        fclose(f);
+    } else {               // we're in the child process, set this up as a daemon
+        if (setsid() < 0)
+            return;
 
-    execle(daemonPath, "oblid", NULL);
+        char *daemonPath = _obli_genPrefixPath(2, OBLI_DIR_PROGRAM, "oblid");
+        char *socketPath = _obli_genPrefixPath(1, OBLI_DIR_NETWORK);
+        
+        // hand control of this process over to {prefix}/bin/oblid
+        execl(daemonPath, OBLID_PROCESS_NAME, socketPath, NULL);
 
-    free(daemonPath);
-    free(socketPath);
+        _obli_freePrefixPath(daemonPath);
+        _obli_freePrefixPath(socketPath);
+    }
+
+    _obli_freePrefixPath(pidFile);
+}
+
+/** KILL OBLID **/
+void obli_killDaemon() {
+    char *pidFile = _obli_genPrefixPath(1, OBLI_FILE_DAEMON);
+    FILE *f = fopen(pidFile, "r");
+    if (f == NULL)
+        return;
+
+    int pid;
+    fscanf(f, "%d", &pid);
+    fclose(f);
+
+    kill(pid, SIGKILL);          // kill int pid read from file
+    remove(pidFile);
 }

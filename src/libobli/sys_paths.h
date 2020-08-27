@@ -5,9 +5,12 @@
 #define OBLI_PREFIX_LENGTH 9
 #define OBLI_PREFIX_BASE ".oblip"
 
-#define OBLI_MODULES_DIR "modules"
-#define OBLI_NETWORK_DIR "network"
-#define OBLI_PROGRAM_DIR "bin"
+#define OBLID_PROCESS_NAME "oblid"
+
+#define OBLI_DIR_MODULES "modules"
+#define OBLI_DIR_NETWORK "network"
+#define OBLI_DIR_PROGRAM "bin"
+#define OBLI_FILE_DAEMON "dpidf"
 
 int _obli_createFolderIfNotExists(const char *);
 

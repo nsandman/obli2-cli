@@ -16,6 +16,7 @@ const char *commands[] = {
     OBLI_CMD_START,
     OBLI_CMD_STARTW,
     OBLI_CMD_STARTS,
+    OBLI_CMD_KILL,
     OBLI_CMD_INSTALL,
     OBLI_CMD_REMOVE,
     OBLI_CMD_LSMOD    
@@ -27,6 +28,7 @@ const char *commandBlurbs[] = {
     "Alias for startWeak",
     "Start in weak mode with limited automation access",
     "Start in strong mode with full access to automation features",
+    "Kill daemon and running obli instances",
     "Install module",
     "Remove module",
     "List all installed modules"
@@ -71,6 +73,12 @@ int _quickPrefix() {
 // TODO: start daemon
 void runStart(bool strong) {
     _quickPrefix();
+    obli_launchDaemon();
+}
+
+void runEnd() {
+    _quickPrefix();
+    obli_killDaemon();
 }
 
 void runInstall(int num, char **names) {
@@ -108,6 +116,9 @@ int main(int argc, char **argv) {
     }
     else if (strcmp(commandName, OBLI_CMD_STARTS) == 0) {
         runStart(true);
+    }
+    else if (strcmp(commandName, OBLI_CMD_KILL) == 0) {
+        runEnd();
     }
     else if (strcmp(commandName, OBLI_CMD_INSTALL) == 0) {
         if (argc < 3) {

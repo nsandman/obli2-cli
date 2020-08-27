@@ -9,5 +9,7 @@
 int obli_setupPrefixIfNotExists(void);
 unsigned int obli_hashModuleName(const char*);
 int obli_installModule(const char*);
+void obli_launchDaemon(void);
+void obli_killDaemon(void);
 
 #endif /* _OBLI_LIB_H_ */
