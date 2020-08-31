@@ -12,8 +12,6 @@ const char *COMMANDS[] = {
     OBLI_CMD_HELP,
     OBLI_CMD_VERS,
     OBLI_CMD_START,
-    OBLI_CMD_STARTW,
-    OBLI_CMD_STARTS,
     OBLI_CMD_KILL,
     OBLI_CMD_INSTALL,
     OBLI_CMD_REMOVE,
@@ -23,9 +21,7 @@ const char *COMMANDS[] = {
 const char *COMMAND_BLURBS[] = {
     "Shows this help message",
     "Print current version string",
-    "Alias for startWeak",
-    "Start in weak mode with limited automation access",
-    "Start in strong mode with full access to automation features",
+    "Start obli session",
     "Kill daemon and running obli instances",
     "Install module",
     "Remove module",
@@ -69,12 +65,28 @@ void runShowHelp(const char *programName) {
 }
 
 void runStart(bool strong) {
+    if (obli_isDaemonRunning())         // do not launch duplicate daemons
+        return;
+
     _quickPrefix();
-    obli_launchDaemon();
+
+    // get pid of spawned daemon
+    int pid = obli_launchDaemon();
+    if (pid == 0)
+        return;
+
+    printf("Attempting to launch daemon… ");
+    if (pid > 0) {
+        cprintf(GREEN, "pid %d.\n", pid);
+    } else if (pid < 0) {
+        cputs("FAILED.", RED);
+        cfprintf(stderr, RED, "Code %d.\n");
+    }
 }
 
 void runEnd() {
     _quickPrefix();
+    puts("Attempting to kill daemon");
     obli_killDaemon();
 }
 

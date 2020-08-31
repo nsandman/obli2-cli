@@ -25,12 +25,6 @@ int main(int argc, char **argv) {
     else if (strcmp(commandName, OBLI_CMD_START) == 0) {
         runStart(false);
     }
-    else if (strcmp(commandName, OBLI_CMD_STARTW) == 0) {
-        runStart(false);
-    }
-    else if (strcmp(commandName, OBLI_CMD_STARTS) == 0) {
-        runStart(true);
-    }
     else if (strcmp(commandName, OBLI_CMD_KILL) == 0) {
         runEnd();
     }

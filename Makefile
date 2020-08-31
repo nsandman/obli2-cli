@@ -12,7 +12,7 @@ start:
 	mkdir -p out
 	python3 gen_outfiles.py
 
-next: $(CLIENT_IGNFILES) $(OUTFILES)
+next: $(CLIENT_IGNFILES) $(OUTFILES) trackd
 dnext: next shrink
 
 out/%.o: %.c
@@ -29,6 +29,11 @@ out/oblid: $(DAEMON_TARGETS)
 
 shrink: $(SHRINK_EXECUTABLES)
 	upx --brute $^
+
+trackd: out/oblid
+	-DPATH=${HOME}/.oblip/bin/oblid && \
+	[ ! -f $$DPATH ] && \
+	ln -s ${PWD}/out/oblid $$DPATH
 
 clean:
 	rm -rf out

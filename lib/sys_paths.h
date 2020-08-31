@@ -10,6 +10,9 @@
 #define OBLI_DIR_MODULES "modules"
 #define OBLI_DIR_NETWORK "network"
 #define OBLI_DIR_PROGRAM "bin"
+#define OBLI_DIR_LOG "log"
+#define OBLI_DIR_TMP "tmp"
+
 #define OBLI_FILE_DAEMON "dpidf"
 
 int _obli_createFolderIfNotExists(const char *);

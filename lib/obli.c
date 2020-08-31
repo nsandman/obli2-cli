@@ -31,7 +31,9 @@ int obli_setupPrefixIfNotExists() {
     const char *subdirectories[] = {
         OBLI_DIR_MODULES,
         OBLI_DIR_PROGRAM,
-        OBLI_DIR_NETWORK
+        OBLI_DIR_NETWORK,
+        OBLI_DIR_TMP,
+        OBLI_DIR_LOG
     };
     for (int i = 0; i < LEN_ARRAY(subdirectories); i++) {
         char *newFolderPath = _obli_genPrefixPath(1, subdirectories[i]);
@@ -65,12 +67,12 @@ int obli_installModule(const char *moduleName) {
     if (strncmp(moduleName, "git@", 4) != 0 &&
             strncmp(moduleName, "git://", 6) != 0 &&
             strncmp(moduleName, "http://", 7) != 0 &&
-            strncmp(moduleName, "https://", 8) != 0) {
+            strncmp(moduleName, "https://", 8) != 0) {      // is not url
         lenUrl += 23;
         url = malloc(lenUrl);
         sprintf(url, "https://github.com/%s.git", moduleName);
     } else {
-        strcpy(url, moduleName);
+        strcpy(url, moduleName);                            // is url
     }
 
     // use a hashing function to generate consistent and searchable directories
@@ -94,20 +96,31 @@ int obli_installModule(const char *moduleName) {
     return 0;
 }
 
-/** LAUNCH OBLID **/
-void obli_launchDaemon() {
+bool obli_isDaemonRunning() {
     char *pidFile = _obli_genPrefixPath(1, OBLI_FILE_DAEMON);
-    if (access(pidFile, F_OK) != -1)
-        return;                 // if pidFile exists, assume we are already running
+    bool res = _obli_isDaemonRunning(pidFile);
+    _obli_freePrefixPath(pidFile);
 
+    return res;
+}
+
+/** LAUNCH OBLID **/
+// NOTE: does not check if oblid is running already
+int obli_launchDaemon() {
     int pid = fork();
     if (pid > 0) {         // parent: save child process id to file and exit 
+        char *pidFile = _obli_genPrefixPath(1, OBLI_FILE_DAEMON);
+
         FILE *f = fopen(pidFile, "w");
         fprintf(f, "%d", pid);
         fclose(f);
+
+        _obli_freePrefixPath(pidFile);
     } else {               // we're in the child process, set this up as a daemon
         if (setsid() < 0)
-            return;
+            return -2;
+
+        // TODO set stdout and stderr to log files in prefix
 
         char *daemonPath = _obli_genPrefixPath(2, OBLI_DIR_PROGRAM, "oblid");
         char *socketPath = _obli_genPrefixPath(1, OBLI_DIR_NETWORK);
@@ -119,7 +132,7 @@ void obli_launchDaemon() {
         _obli_freePrefixPath(socketPath);
     }
 
-    _obli_freePrefixPath(pidFile);
+    return pid;
 }
 
 /** KILL OBLID **/
@@ -136,4 +149,9 @@ void obli_killDaemon() {
     kill(pid, SIGKILL);          // kill int pid read from file
     remove(pidFile);
     _obli_freePrefixPath(pidFile);
+}
+
+/** PRIVATE functions **/
+bool _obli_isDaemonRunning(const char *path) {
+    return (access(path, F_OK) != -1);          // if pidFile exists, assume we are already running             
 }
