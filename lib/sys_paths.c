@@ -4,6 +4,8 @@
 #include <stdarg.h>
 #include <sys/stat.h>
 
+#include "obli.h"
+#include "constants.h"
 #include "sys_paths.h"
 
 /* RETURNS: 0 on create, -1 on error, 1 on do nothing */
@@ -63,4 +65,26 @@ char *_obli_genPrefixPath(int numPieces, ...) {
 
 void _obli_freePrefixPath(char *prefixPath) {
     free(prefixPath);
+}
+
+void _obli_populatePrefix(int *creationStatus) {
+    const char *subdirectories[] = {
+        OBLI_DIR_MODULES,
+        OBLI_DIR_PROGRAM,
+        OBLI_DIR_NETWORK,
+        OBLI_DIR_TMP,
+        OBLI_DIR_LOG
+    };
+    for (int i = 0; i < LEN_ARRAY(subdirectories); i++) {
+        char *newFolderPath = _obli_genPrefixPath(1, subdirectories[i]);
+
+        int lastFolderResult = _obli_createFolderIfNotExists(newFolderPath);
+        if (lastFolderResult < 0) {
+            continue;           // move on if error
+        } else if ((lastFolderResult == 0) && (*creationStatus != OBLI_PREFIX_CREATED)) {
+            *creationStatus = OBLI_PREFIX_POPULATED;
+        }
+
+        _obli_freePrefixPath(newFolderPath);
+    }
 }

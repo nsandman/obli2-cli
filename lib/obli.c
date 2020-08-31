@@ -27,26 +27,7 @@ int obli_setupPrefixIfNotExists() {
     }
 
     _obli_freePrefixPath(obliDirPath);
-
-    const char *subdirectories[] = {
-        OBLI_DIR_MODULES,
-        OBLI_DIR_PROGRAM,
-        OBLI_DIR_NETWORK,
-        OBLI_DIR_TMP,
-        OBLI_DIR_LOG
-    };
-    for (int i = 0; i < LEN_ARRAY(subdirectories); i++) {
-        char *newFolderPath = _obli_genPrefixPath(1, subdirectories[i]);
-
-        lastFolderResult = _obli_createFolderIfNotExists(newFolderPath);
-        if (lastFolderResult < 0) {
-            return lastFolderResult;
-        } else if ((lastFolderResult == 0) && (creationStatus != OBLI_PREFIX_CREATED)) {
-            creationStatus = OBLI_PREFIX_POPULATED;
-        }
-
-        _obli_freePrefixPath(newFolderPath);
-    }
+    _obli_populatePrefix(&creationStatus);
 
     return creationStatus;
 }

@@ -19,5 +19,6 @@ int _obli_createFolderIfNotExists(const char *);
 
 char *_obli_genPrefixPath(int, ...);
 void _obli_freePrefixPath(char*);
+void _obli_populatePrefix(int*);
 
 #endif /* _SYS_PATH_H */
