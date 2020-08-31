@@ -7,6 +7,7 @@
 
 #define OBLID_PROCESS_NAME "oblid"
 
+#define OBLI_DIR_PROFILES "profiles"
 #define OBLI_DIR_MODULES "modules"
 #define OBLI_DIR_NETWORK "network"
 #define OBLI_DIR_PROGRAM "bin"

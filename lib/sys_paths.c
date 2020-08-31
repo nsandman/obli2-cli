@@ -69,6 +69,7 @@ void _obli_freePrefixPath(char *prefixPath) {
 
 void _obli_populatePrefix(int *creationStatus) {
     const char *subdirectories[] = {
+        OBLI_DIR_PROFILES,
         OBLI_DIR_MODULES,
         OBLI_DIR_PROGRAM,
         OBLI_DIR_NETWORK,
